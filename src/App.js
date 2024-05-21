@@ -162,14 +162,14 @@ const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
             <View key={index} style={styles.tableRow}>
               <View style={styles.tableCol}><Text style={styles.tableCell}>{index + 1}</Text></View>
               <View style={styles.tableCol}><Text style={styles.tableCell}>{item.name}</Text></View>
-              <View style={styles.tableCol}><Text style={styles.tableCell}>₹{item.price.toFixed(2)}</Text></View>
+              <View style={styles.tableCol}><Text style={styles.tableCell}>{item.price.toFixed(2)}</Text></View>
             </View>
           ))}
         </View>
         <View style={styles.line} />
-        <Text style={styles.total}>Total: ₹{total.toFixed(2)}</Text>
-        <Text style={styles.total}>Discount: {discountPercentage}% (₹{discount.toFixed(2)})</Text>
-        <Text style={styles.total}>Final Total: ₹{finalTotal.toFixed(2)}</Text>
+        <Text style={styles.total}>Total: {total.toFixed(2)}</Text>
+        <Text style={styles.total}>Discount: {discountPercentage}% ({discount.toFixed(2)})</Text>
+        <Text style={styles.total}>Final Total: {finalTotal.toFixed(2)} Rupees only</Text>
         <Text style={styles.thanks}>Thank You for your Business!</Text>
       </Page>
     </Document>
