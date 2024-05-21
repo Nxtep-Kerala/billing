@@ -182,7 +182,7 @@ const InvoiceApp = () => {
   const [price, setPrice] = useState('');
   const [discountPercentage, setDiscountPercentage] = useState(0);
   const [billTo, setBillTo] = useState({ name: '', address: '', email: '', phone: '' });
-  const [invoiceNumber, setInvoiceNumber] = useState(`INV${new Date().getTime()}`);
+  const [invoiceNumber] = useState(`INV${new Date().getTime()}`);
   const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const handleAddItem = () => {
