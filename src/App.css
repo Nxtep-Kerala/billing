@@ -1,38 +1,113 @@
-.App {
-  text-align: center;
+/* General body styles, sets margin and font smoothing for better text rendering */
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: Arial, sans-serif; /* Consistency in font */
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Container for overall alignment and padding */
+.container {
+  padding: 20px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* Card styling for clear segmentation */
+.card {
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  margin-top: 20px;
+  border-radius: 5px;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* Style for headers within cards to increase readability */
+.card-header {
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 10px;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+/* Standard grid layout to ensure alignment and spacing are consistent */
+.grid {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+/* Form inputs standardization for visual consistency */
+.input {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Button styling for primary actions */
+.button-primary {
+  background-color: #1976d2;
   color: white;
+  border: none;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  transition: background-color 0.3s;
+  cursor: pointer;
+  border-radius: 4px;
 }
 
-.App-link {
-  color: #61dafb;
+.button-primary:hover {
+  background-color: #125ca1;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+/* Secondary button styles for alternative actions */
+.button-secondary {
+  background-color: #dc004e;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  transition: background-color 0.3s;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.button-secondary:hover {
+  background-color: #a3003e;
+}
+
+/* Snackbar and alerts for feedback */
+.snackbar {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+
+.alert {
+  padding: 20px;
+  background-color: #f44336; /* Red */
+  color: white;
+  text-align: center;
+
+}
+
+/* Responsive layout adjustments */
+@media (max-width: 768px) {
+  .grid {
+    flex-direction: column;
   }
-  to {
-    transform: rotate(360deg);
+
+  .input, .button-primary, .button-secondary {
+    width: 100%;
   }
 }

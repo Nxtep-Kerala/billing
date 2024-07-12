@@ -1,5 +1,13 @@
-import React, { useState } from 'react';
-import { Document, Page, Text, View, StyleSheet, Image, PDFDownloadLink } from '@react-pdf/renderer';
+import React, { useState, useEffect } from "react";
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+  Image,
+  PDFDownloadLink,
+} from "@react-pdf/renderer";
 import {
   Container,
   Grid,
@@ -18,30 +26,47 @@ import {
   Alert,
   Card,
   CardContent,
-  InputAdornment
-} from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import PhoneIcon from '@mui/icons-material/Phone';
-import EmailIcon from '@mui/icons-material/Email';
-import SaveIcon from '@mui/icons-material/Save';
-import headerImage from './images/header.png';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import db from './firebase-config';
-import { collection, addDoc } from 'firebase/firestore';
+  InputAdornment,
+  MenuItem,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemSecondaryAction,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import PhoneIcon from "@mui/icons-material/Phone";
+import EmailIcon from "@mui/icons-material/Email";
+import SaveIcon from "@mui/icons-material/Save";
+import headerImage from "./images/header.png";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import db from "./firebase-config";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  doc,
+  deleteDoc,
+  updateDoc,
+} from "firebase/firestore";
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#1976d2',
+      main: "#1976d2",
     },
     secondary: {
-      main: '#dc004e',
+      main: "#dc004e",
     },
   },
   typography: {
-    fontFamily: 'Arial',
+    fontFamily: "Arial",
     h4: {
-      fontSize: '1.5rem',
+      fontSize: "1.5rem",
       fontWeight: 500,
     },
   },
@@ -49,92 +74,110 @@ const theme = createTheme({
 
 const styles = StyleSheet.create({
   page: {
-    fontFamily: 'Helvetica',
+    fontFamily: "Helvetica",
     fontSize: 12,
     padding: 30,
-    color: '#333',
-  },
-  headerImage: {
-    width: '100%',
-    marginBottom: 10,
+    color: "#333",
+    backgroundColor: "#fff"
   },
   headerText: {
     fontSize: 16,
-    marginBottom: 20,
-    textAlign: 'left',
-    fontWeight: 'bold',
+    marginBottom: 5,
+    textAlign: "left",
+    fontWeight: "bold",
+    color: "#000"
   },
   sectionHeader: {
     fontSize: 14,
-    marginVertical: 10,
-    textAlign: 'left',
-    fontWeight: 'bold',
+    marginVertical: 5,
+    textAlign: "left",
+    fontWeight: "bold",
+    color: "#000"
   },
   details: {
-    marginBottom: 20,
-    padding: 10,
-    border: '1px solid #ccc',
+    marginBottom: 10,
+    padding: 5,
     borderRadius: 5,
   },
   detailText: {
-    fontSize: 12,
-    marginVertical: 2,
+    fontSize: 15,
+    marginVertical: 1,
+    color: "#000"
   },
   table: {
-    display: 'table',
-    width: 'auto',
-    borderStyle: 'solid',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderCollapse: 'collapse',
+    display: "table",
+    width: "100%",
+    borderCollapse: "collapse"
   },
   tableRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   tableColHeader: {
-    width: '33.33%',
-    borderStyle: 'solid',
+    width: "25%",
+    borderStyle: "solid",
     borderWidth: 1,
-    borderColor: '#ccc',
-    backgroundColor: '#f3f3f3',
-    fontWeight: 600,
+    borderColor: "#ccc",
+    backgroundColor: "#fff",
+    color: "#333",
+    fontWeight: "600",
     padding: 5,
-    textAlign: 'center',
+    textAlign: "center"
   },
-  tableCol: {
-    width: '33.33%',
-    borderStyle: 'solid',
-    borderWidth: 1,
-    borderColor: '#ccc',
+  invisibleColHeader: {
+    width: "25%",
     padding: 5,
-    textAlign: 'center',
+    backgroundColor: "#fff"
+
+  },
+
+  tableCol: {
+    width: "25%",
+    borderStyle: "solid",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 5,
+    textAlign: "center",
+    backgroundColor: "#fff"
   },
   tableCell: {
     margin: 5,
     fontSize: 12,
+    color: "#000"
   },
   total: {
     fontSize: 14,
-    marginTop: 20,
-    textAlign: 'right',
-    fontWeight: 'bold',
-  },
-  thanks: {
-    marginTop: 20,
-    fontSize: 12,
-    textAlign: 'center',
-    fontWeight: 'bold',
+    marginTop: 10,
+    textAlign: "right",
+    fontWeight: "bold",
+    color: "#000"
   },
   line: {
-    height: 1,
-    backgroundColor: '#ccc',
-    marginTop: 10,
-    marginBottom: 10,
-  }
+    position: 'absolute',   
+    bottom: 35,             
+    left: 10,               
+    right: 10,              
+    height: 2,             
+    backgroundColor: "#A783EE", 
+  },
+  
+  thanks: {
+    position: 'absolute',
+    bottom: 10,            
+    width: '100%',
+    fontSize: 12,
+    textAlign: "center",
+    fontWeight: "bold",
+    color: "#000"
+  },
 });
 
+
+
 const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
-  const total = items.reduce((total, item) => total + item.price, 0);
+  const total = items.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0
+  );
   const discount = total * (discountPercentage / 100);
   const finalTotal = total - discount;
 
@@ -143,34 +186,120 @@ const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
       <Page size="A4" style={styles.page}>
         <Image style={styles.headerImage} src={headerImage} />
         <Text style={styles.headerText}>Invoice Number: {invoiceNumber}</Text>
-        <Text style={styles.headerText}>Date: {new Date().toLocaleDateString()}</Text>
+        <Text style={styles.headerText}>
+          Date: {new Date().toLocaleDateString()}
+        </Text>
         <Text style={styles.sectionHeader}>Bill to:</Text>
         <View style={styles.details}>
-          <Text style={styles.detailText}><strong>Name:</strong> {billTo.name}</Text>
-          <Text style={styles.detailText}><strong>Address:</strong> {billTo.address}</Text>
-          <Text style={styles.detailText}><strong>Email:</strong> {billTo.email}</Text>
-          <Text style={styles.detailText}><strong>Phone:</strong> {billTo.phone}</Text>
+          <Text style={styles.detailText}>
+            <strong>Name:</strong> {billTo.name}
+          </Text>
+          <Text style={styles.detailText}>
+            <strong>Address:</strong> {billTo.address}
+          </Text>
+          <Text style={styles.detailText}>
+            <strong>Email:</strong> {billTo.email}
+          </Text>
+          <Text style={styles.detailText}>
+            <strong>Phone:</strong> {billTo.phone}
+          </Text>
         </View>
         <View style={styles.line} />
         <View style={styles.table}>
           <View style={styles.tableRow}>
-            <View style={styles.tableColHeader}><Text style={styles.tableCell}>S.No</Text></View>
-            <View style={styles.tableColHeader}><Text style={styles.tableCell}>Item</Text></View>
-            <View style={styles.tableColHeader}><Text style={styles.tableCell}>Price</Text></View>
+            <View style={styles.tableColHeader}>
+              <Text style={styles.tableCell}>S.No</Text>
+            </View>
+            <View style={styles.tableColHeader}>
+              <Text style={styles.tableCell}>Item</Text>
+            </View>
+            <View style={styles.tableColHeader}>
+              <Text style={styles.tableCell}>Quantity</Text>
+            </View>
+            <View style={styles.tableColHeader}>
+              <Text style={styles.tableCell}>Price </Text>
+            </View>
+            <View style={styles.tableColHeader}>
+              <Text style={styles.tableCell}>Total </Text>
+            </View>
           </View>
           {items.map((item, index) => (
             <View key={index} style={styles.tableRow}>
-              <View style={styles.tableCol}><Text style={styles.tableCell}>{index + 1}</Text></View>
-              <View style={styles.tableCol}><Text style={styles.tableCell}>{item.name}</Text></View>
-              <View style={styles.tableCol}><Text style={styles.tableCell}>{item.price.toFixed(2)}</Text></View>
+              <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>{index + 1}</Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>{item.name}</Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>{item.quantity}</Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>{item.price.toFixed(2)}</Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>
+                  {(item.price * item.quantity).toFixed(2)}
+                </Text>
+              </View>
             </View>
           ))}
+          <View style={styles.tableRow}>
+            <View style={styles.invisibleColHeader}>
+              <Text style={styles.tableCell}></Text>
+            </View>
+            <View style={styles.invisibleColHeader}>
+              <Text style={styles.tableCell}></Text>
+            </View>
+            <View style={styles.invisibleColHeader}>
+              <Text style={styles.tableCell}></Text>
+            </View>
+            <View style={styles.tableColHeader}>
+              <Text style={styles.tableCell}>Total :</Text>
+            </View>
+            <View style={styles.tableColHeader}>
+              <Text style={styles.tableCell}>{total.toFixed(2)} </Text>
+            </View>
+          </View>
+
+          <View style={styles.tableRow}>
+            <View style={styles.invisibleColHeader}>
+              <Text style={styles.tableCell}></Text>
+            </View>
+            <View style={styles.invisibleColHeader}>
+              <Text style={styles.tableCell}></Text>
+            </View>
+            <View style={styles.invisibleColHeader}>
+              <Text style={styles.tableCell}></Text>
+            </View>
+            <View style={styles.tableColHeader}>
+              <Text style={styles.tableCell}>Discount :</Text>
+            </View>
+            <View style={styles.tableColHeader}>
+              <Text style={styles.tableCell}>{discountPercentage}% ({discount.toFixed(2)}) </Text>
+            </View>
+          </View>
+
+          <View style={styles.tableRow}>
+            <View style={styles.invisibleColHeader}>
+              <Text style={styles.tableCell}></Text>
+            </View>
+            <View style={styles.invisibleColHeader}>
+              <Text style={styles.tableCell}></Text>
+            </View>
+            <View style={styles.invisibleColHeader}>
+              <Text style={styles.tableCell}></Text>
+            </View>
+            <View style={styles.tableColHeader}>
+              <Text style={styles.tableCell}>Final Total: </Text>
+            </View>
+            <View style={styles.tableColHeader}>
+              <Text style={styles.tableCell}>{finalTotal.toFixed(2)} Rupees only</Text>
+            </View>
+          </View>
         </View>
-        <View style={styles.line} />
-        <Text style={styles.total}>Total: {total.toFixed(2)}</Text>
-        <Text style={styles.total}>Discount: {discountPercentage}% ({discount.toFixed(2)})</Text>
-        <Text style={styles.total}>Final Total: {finalTotal.toFixed(2)} Rupees only</Text>
-        <Text style={styles.thanks}>Thank You for your Business!</Text>
+        <View style={styles.line}></View>
+    <Text style={styles.thanks}>Thank You for your Business!</Text>
       </Page>
     </Document>
   );
@@ -178,22 +307,63 @@ const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
 
 const InvoiceApp = () => {
   const [items, setItems] = useState([]);
-  const [item, setItem] = useState('');
-  const [price, setPrice] = useState('');
+  const [item, setItem] = useState("");
+  const [price, setPrice] = useState("");
+  const [quantity, setQuantity] = useState(1);
   const [discountPercentage, setDiscountPercentage] = useState(0);
-  const [billTo, setBillTo] = useState({ name: '', address: '', email: '', phone: '' });
+  const [billTo, setBillTo] = useState({
+    name: "",
+    address: "",
+    email: "",
+    phone: "",
+  });
   const [invoiceNumber] = useState(`INV${new Date().getTime()}`);
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [clients, setClients] = useState([]);
+  const [selectedClient, setSelectedClient] = useState("");
+  const [openClientDialog, setOpenClientDialog] = useState(false);
+  const [openInvoiceDialog, setOpenInvoiceDialog] = useState(false);
+  const [editingClient, setEditingClient] = useState(null);
+  const [invoices, setInvoices] = useState([]);
 
+  useEffect(() => {
+    fetchClients();
+    fetchInvoices();
+  }, []);
+
+  const fetchClients = async () => {
+    const clientsCollection = collection(db, "clients");
+    const clientSnapshot = await getDocs(clientsCollection);
+    const clientList = clientSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    setClients(clientList);
+  };
+
+  const fetchInvoices = async () => {
+    const invoicesCollection = collection(db, "invoices");
+    const invoiceSnapshot = await getDocs(invoicesCollection);
+    const invoiceList = invoiceSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    setInvoices(invoiceList);
+  };
   const handleAddItem = () => {
-    if (!item || price <= 0) {
+    if (!item || price <= 0 || quantity <= 0) {
       setOpenSnackbar(true);
       return;
     }
-    const newItem = { name: item, price: parseFloat(price) };
+    const newItem = {
+      name: item,
+      price: parseFloat(price),
+      quantity: parseInt(quantity),
+    };
     setItems([...items, newItem]);
-    setItem('');
-    setPrice('');
+    setItem("");
+    setPrice("");
+    setQuantity(1);
   };
 
   const handleSnackbarClose = () => {
@@ -210,15 +380,67 @@ const InvoiceApp = () => {
       discountPercentage,
       billTo,
       invoiceNumber,
-      createdAt: new Date()
+      createdAt: new Date(),
     };
     try {
-      await addDoc(collection(db, 'invoices'), invoiceData);
-      alert('Invoice saved successfully!');
+      await addDoc(collection(db, "invoices"), invoiceData);
+      alert("Invoice saved successfully!");
+      fetchInvoices();
     } catch (error) {
-      console.error('Error saving invoice: ', error);
-      alert('Failed to save invoice.');
+      console.error("Error saving invoice: ", error);
+      alert("Failed to save invoice.");
     }
+  };
+
+  const saveClientDetails = async () => {
+    try {
+      if (editingClient) {
+        await updateDoc(doc(db, "clients", editingClient.id), billTo);
+        alert("Client details updated successfully!");
+      } else {
+        await addDoc(collection(db, "clients"), billTo);
+        alert("Client details saved successfully!");
+      }
+      fetchClients();
+      setOpenClientDialog(false);
+      setEditingClient(null);
+      setBillTo({ name: "", address: "", email: "", phone: "" });
+    } catch (error) {
+      console.error("Error saving client details: ", error);
+      alert("Failed to save client details.");
+    }
+  };
+
+  const handleClientSelect = (e) => {
+    const clientId = e.target.value;
+    setSelectedClient(clientId);
+    const selectedClient = clients.find((client) => client.id === clientId);
+    if (selectedClient) {
+      setBillTo(selectedClient);
+    }
+  };
+
+  const handleDeleteClient = async (clientId) => {
+    try {
+      await deleteDoc(doc(db, "clients", clientId));
+      alert("Client deleted successfully!");
+      fetchClients();
+    } catch (error) {
+      console.error("Error deleting client: ", error);
+      alert("Failed to delete client.");
+    }
+  };
+
+  const handleEditClient = (client) => {
+    setEditingClient(client);
+    setBillTo(client);
+    setOpenClientDialog(true);
+  };
+
+  const handleCloseClientDialog = () => {
+    setOpenClientDialog(false);
+    setEditingClient(null);
+    setBillTo({ name: "", address: "", email: "", phone: "" });
   };
 
   return (
@@ -226,14 +448,34 @@ const InvoiceApp = () => {
       <Container maxWidth="sm">
         <Card sx={{ mt: 3 }}>
           <CardContent>
-            <Typography variant="h4" gutterBottom>Invoice Generator</Typography>
+            <Typography variant="h4" gutterBottom>
+              Invoice Generator
+            </Typography>
             <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  select
+                  fullWidth
+                  label="Select Client"
+                  value={selectedClient}
+                  onChange={handleClientSelect}
+                  variant="outlined"
+                >
+                  {clients.map((client) => (
+                    <MenuItem key={client.id} value={client.id}>
+                      {client.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
               <Grid item xs={12}>
                 <TextField
                   fullWidth
                   label="Bill To Name"
                   value={billTo.name}
-                  onChange={e => setBillTo({ ...billTo, name: e.target.value })}
+                  onChange={(e) =>
+                    setBillTo({ ...billTo, name: e.target.value })
+                  }
                   variant="outlined"
                 />
               </Grid>
@@ -242,7 +484,9 @@ const InvoiceApp = () => {
                   fullWidth
                   label="Bill To Address"
                   value={billTo.address}
-                  onChange={e => setBillTo({ ...billTo, address: e.target.value })}
+                  onChange={(e) =>
+                    setBillTo({ ...billTo, address: e.target.value })
+                  }
                   variant="outlined"
                 />
               </Grid>
@@ -251,7 +495,9 @@ const InvoiceApp = () => {
                   fullWidth
                   label="Email"
                   value={billTo.email}
-                  onChange={e => setBillTo({ ...billTo, email: e.target.value })}
+                  onChange={(e) =>
+                    setBillTo({ ...billTo, email: e.target.value })
+                  }
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -267,7 +513,9 @@ const InvoiceApp = () => {
                   fullWidth
                   label="Phone"
                   value={billTo.phone}
-                  onChange={e => setBillTo({ ...billTo, phone: e.target.value })}
+                  onChange={(e) =>
+                    setBillTo({ ...billTo, phone: e.target.value })
+                  }
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -283,17 +531,32 @@ const InvoiceApp = () => {
                   fullWidth
                   label="Item Name"
                   value={item}
-                  onChange={e => setItem(e.target.value)}
+                  onChange={(e) => setItem(e.target.value)}
                   variant="outlined"
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={6}>
                 <TextField
                   fullWidth
-                  label="Price (₹)"
+                  label="Price "
                   type="number"
                   value={price}
-                  onChange={e => setPrice(e.target.value)}
+                  onChange={(e) => setPrice(e.target.value)}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">₹</InputAdornment>
+                    ),
+                  }}
+                  variant="outlined"
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Quantity"
+                  type="number"
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
                   variant="outlined"
                 />
               </Grid>
@@ -303,12 +566,17 @@ const InvoiceApp = () => {
                   label="Discount (%)"
                   type="number"
                   value={discountPercentage}
-                  onChange={e => setDiscountPercentage(e.target.value)}
+                  onChange={(e) => setDiscountPercentage(e.target.value)}
                   variant="outlined"
                 />
               </Grid>
               <Grid item xs={12}>
-                <Button variant="contained" onClick={handleAddItem} color="primary" sx={{ mt: 2 }}>
+                <Button
+                  variant="contained"
+                  onClick={handleAddItem}
+                  color="primary"
+                  sx={{ mt: 2 }}
+                >
                   Add Item
                 </Button>
               </Grid>
@@ -320,7 +588,9 @@ const InvoiceApp = () => {
                     <TableRow>
                       <TableCell>S.No</TableCell>
                       <TableCell>Description</TableCell>
-                      <TableCell align="right">Price (₹)</TableCell>
+                      <TableCell align="right">Quantity</TableCell>
+                      <TableCell align="right">Price </TableCell>
+                      <TableCell align="right">Total </TableCell>
                       <TableCell align="right">Delete</TableCell>
                     </TableRow>
                   </TableHead>
@@ -329,9 +599,18 @@ const InvoiceApp = () => {
                       <TableRow key={index}>
                         <TableCell>{index + 1}</TableCell>
                         <TableCell>{item.name}</TableCell>
-                        <TableCell align="right">₹{item.price.toFixed(2)}</TableCell>
+                        <TableCell align="right">{item.quantity}</TableCell>
                         <TableCell align="right">
-                          <IconButton onClick={() => handleDeleteItem(index)} color="error">
+                          ₹{item.price.toFixed(2)}
+                        </TableCell>
+                        <TableCell align="right">
+                          ₹{(item.price * item.quantity).toFixed(2)}
+                        </TableCell>
+                        <TableCell align="right">
+                          <IconButton
+                            onClick={() => handleDeleteItem(index)}
+                            color="error"
+                          >
                             <DeleteIcon />
                           </IconButton>
                         </TableCell>
@@ -342,7 +621,7 @@ const InvoiceApp = () => {
               </TableContainer>
             )}
             <Grid container spacing={2} sx={{ mt: 2 }}>
-              <Grid item xs={6}>
+              <Grid item xs={4}>
                 <Button
                   variant="contained"
                   color="secondary"
@@ -350,25 +629,188 @@ const InvoiceApp = () => {
                   startIcon={<SaveIcon />}
                   fullWidth
                 >
-                  Save to Firebase
+                  Save Invoice
                 </Button>
               </Grid>
-              <Grid item xs={6}>
-                <PDFDownloadLink
-                  document={<InvoicePDF items={items} discountPercentage={discountPercentage} billTo={billTo} invoiceNumber={invoiceNumber} />}
-                  fileName={`invoice-${invoiceNumber}.pdf`}
+              <Grid item xs={4}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => setOpenClientDialog(true)}
+                  startIcon={<SaveIcon />}
+                  fullWidth
                 >
-                  <Button variant="contained" color="primary" fullWidth>
-                    Download Invoice
-                  </Button>
-                </PDFDownloadLink>
+                  Manage Clients
+                </Button>
+              </Grid>
+              <Grid item xs={4}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => setOpenInvoiceDialog(true)}
+                  fullWidth
+                >
+                  View Invoices
+                </Button>
+              </Grid>
+              <Grid item xs={4}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => setOpenInvoiceDialog(true)}
+                  fullWidth
+                >
+                  <PDFDownloadLink
+                    document={
+                      <InvoicePDF
+                        items={items}
+                        discountPercentage={discountPercentage}
+                        billTo={billTo}
+                        invoiceNumber={invoiceNumber}
+                      />
+                    }
+                    fileName="invoice.pdf"
+                  >
+                    {({ blob, url, loading, error }) =>
+                      loading ? "Loading document..." : "Download now!"
+                    }
+                  </PDFDownloadLink>{" "}
+                </Button>
               </Grid>
             </Grid>
           </CardContent>
         </Card>
-        <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleSnackbarClose}>
-          <Alert onClose={handleSnackbarClose} severity="error" sx={{ width: '100%' }}>
-            Please enter valid item name and price.
+        <Dialog open={openClientDialog} onClose={handleCloseClientDialog}>
+          <DialogTitle>
+            {editingClient ? "Edit Client" : "Add New Client"}
+          </DialogTitle>
+          <DialogContent>
+            <TextField
+              fullWidth
+              label="Name"
+              value={billTo.name}
+              onChange={(e) => setBillTo({ ...billTo, name: e.target.value })}
+              margin="normal"
+            />
+            <TextField
+              fullWidth
+              label="Address"
+              value={billTo.address}
+              onChange={(e) =>
+                setBillTo({ ...billTo, address: e.target.value })
+              }
+              margin="normal"
+            />
+            <TextField
+              fullWidth
+              label="Email"
+              value={billTo.email}
+              onChange={(e) => setBillTo({ ...billTo, email: e.target.value })}
+              margin="normal"
+            />
+            <TextField
+              fullWidth
+              label="Phone"
+              value={billTo.phone}
+              onChange={(e) => setBillTo({ ...billTo, phone: e.target.value })}
+              margin="normal"
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseClientDialog}>Cancel</Button>
+            <Button onClick={saveClientDetails} color="primary">
+              Save
+            </Button>
+          </DialogActions>
+          <DialogContent>
+            <Typography variant="h6">Client List</Typography>
+            <List>
+              {clients.map((client) => (
+                <ListItem key={client.id}>
+                  <ListItemText
+                    primary={client.name}
+                    secondary={client.email}
+                  />
+                  <ListItemSecondaryAction>
+                    <IconButton
+                      edge="end"
+                      aria-label="edit"
+                      onClick={() => handleEditClient(client)}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton
+                      edge="end"
+                      aria-label="delete"
+                      onClick={() => handleDeleteClient(client.id)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </ListItemSecondaryAction>
+                </ListItem>
+              ))}
+            </List>
+          </DialogContent>
+        </Dialog>
+        <Dialog
+          open={openInvoiceDialog}
+          onClose={() => setOpenInvoiceDialog(false)}
+          maxWidth="md"
+          fullWidth
+        >
+          <DialogTitle>Previous Invoices</DialogTitle>
+          <DialogContent>
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Invoice Number</TableCell>
+                    <TableCell>Client Name</TableCell>
+                    <TableCell>Date</TableCell>
+                    <TableCell>Total Amount</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {invoices.map((invoice) => (
+                    <TableRow key={invoice.id}>
+                      <TableCell>{invoice.invoiceNumber}</TableCell>
+                      <TableCell>{invoice.billTo.name}</TableCell>
+                      <TableCell>
+                        {new Date(
+                          invoice.createdAt.seconds * 1000
+                        ).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        ₹
+                        {invoice.items
+                          .reduce(
+                            (total, item) => total + item.price * item.quantity,
+                            0
+                          )
+                          .toFixed(2)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenInvoiceDialog(false)}>Close</Button>
+          </DialogActions>
+        </Dialog>
+
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={6000}
+          onClose={handleSnackbarClose}
+        >
+          <Alert
+            onClose={handleSnackbarClose}
+            severity="error"
+            sx={{ width: "100%" }}
+          >
+            Please enter valid item name, price, and quantity.
           </Alert>
         </Snackbar>
       </Container>
