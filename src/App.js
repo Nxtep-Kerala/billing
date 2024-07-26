@@ -85,14 +85,16 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     textAlign: "left",
     fontWeight: "bold",
-    color: "#000"
+    color: "#000",
+    
   },
   sectionHeader: {
     fontSize: 14,
     marginVertical: 5,
     textAlign: "left",
     fontWeight: "bold",
-    color: "#000"
+    color: "#000",
+    
   },
   details: {
     marginBottom: 10,
@@ -123,10 +125,9 @@ const styles = StyleSheet.create({
     padding: 5,
     textAlign: "center"
   },
-  invisibleColHeader: {
-    width: "25%",
-    padding: 5,
-    backgroundColor: "#fff"
+  InvoiceMain: {  
+    marginTop: 10,
+    marginBottom: 20
 
   },
 
@@ -168,10 +169,34 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "bold",
     color: "#000"
+  },footer: {
+    fontSize: 12,
+    textAlign: 'center',
+    position: 'absolute',
+    bottom: 20,
+    width: '100%',
+    borderTopWidth: 1,
+    borderColor: '#ccc',
+    paddingTop: 5,
+  },totalInWords: {
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 5,
+    fontStyle: 'italic',
   },
 });
 
 
+const numberToWords = (num) => {
+  // Simplified conversion function
+  const under20 = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+  const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+
+  if (num < 20) return under20[num];
+  if (num < 100) return tens[Math.floor(num / 10)] + (num % 10 ? '-' + under20[num % 10] : '');
+  if (num < 1000) return under20[Math.floor(num / 100)] + ' hundred' + (num % 100 ? ' ' + numberToWords(num % 100) : '');
+  return 'Number too large';
+};
 
 const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
   const total = items.reduce(
@@ -180,15 +205,20 @@ const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
   );
   const discount = total * (discountPercentage / 100);
   const finalTotal = total - discount;
+  
+
 
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         <Image style={styles.headerImage} src={headerImage} />
+        <div style={styles.InvoiceMain}>
         <Text style={styles.headerText}>Invoice Number: {invoiceNumber}</Text>
         <Text style={styles.headerText}>
           Date: {new Date().toLocaleDateString()}
         </Text>
+        </div>
+        
         <Text style={styles.sectionHeader}>Bill to:</Text>
         <View style={styles.details}>
           <Text style={styles.detailText}>
@@ -245,13 +275,13 @@ const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
             </View>
           ))}
           <View style={styles.tableRow}>
-            <View style={styles.invisibleColHeader}>
+            <View style={styles.tableColHeader}>
               <Text style={styles.tableCell}></Text>
             </View>
-            <View style={styles.invisibleColHeader}>
+            <View style={styles.tableColHeader}>
               <Text style={styles.tableCell}></Text>
             </View>
-            <View style={styles.invisibleColHeader}>
+            <View style={styles.tableColHeader}>
               <Text style={styles.tableCell}></Text>
             </View>
             <View style={styles.tableColHeader}>
@@ -263,13 +293,13 @@ const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
           </View>
 
           <View style={styles.tableRow}>
-            <View style={styles.invisibleColHeader}>
+            <View style={styles.tableColHeader}>
               <Text style={styles.tableCell}></Text>
             </View>
-            <View style={styles.invisibleColHeader}>
+            <View style={styles.tableColHeader}>
               <Text style={styles.tableCell}></Text>
             </View>
-            <View style={styles.invisibleColHeader}>
+            <View style={styles.tableColHeader}>
               <Text style={styles.tableCell}></Text>
             </View>
             <View style={styles.tableColHeader}>
@@ -281,22 +311,24 @@ const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
           </View>
 
           <View style={styles.tableRow}>
-            <View style={styles.invisibleColHeader}>
+            <View style={styles.tableColHeader}>
               <Text style={styles.tableCell}></Text>
             </View>
-            <View style={styles.invisibleColHeader}>
+            <View style={styles.tableColHeader}>
               <Text style={styles.tableCell}></Text>
             </View>
-            <View style={styles.invisibleColHeader}>
+            <View style={styles.tableColHeader}>
               <Text style={styles.tableCell}></Text>
             </View>
             <View style={styles.tableColHeader}>
               <Text style={styles.tableCell}>Final Total: </Text>
             </View>
             <View style={styles.tableColHeader}>
-              <Text style={styles.tableCell}>{finalTotal.toFixed(2)} Rupees only</Text>
+              <Text style={styles.tableCell}>{finalTotal.toFixed(2)}</Text>
             </View>
           </View>
+          
+        <Text style={styles.totalInWords}>Total in Words: {numberToWords(Math.floor(finalTotal))} Rupee only</Text>
         </View>
         <View style={styles.line}></View>
     <Text style={styles.thanks}>Thank You for your Business!</Text>
