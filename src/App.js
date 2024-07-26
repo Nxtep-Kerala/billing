@@ -81,20 +81,18 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff"
   },
   headerText: {
-    fontSize: 16,
+    fontSize: 12,
     marginBottom: 5,
     textAlign: "left",
     fontWeight: "bold",
     color: "#000",
-    
   },
   sectionHeader: {
-    fontSize: 14,
+    fontSize: 12,
     marginVertical: 5,
     textAlign: "left",
     fontWeight: "bold",
     color: "#000",
-    
   },
   details: {
     marginBottom: 10,
@@ -102,48 +100,49 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   detailText: {
-    fontSize: 15,
+    fontSize: 12,
     marginVertical: 1,
     color: "#000"
   },
+  InvoiceMain: {  
+    marginTop: 8,
+    marginBottom: 20
+  },
   table: {
     display: "table",
-    width: "100%",
-    borderCollapse: "collapse"
+    width: "auto",
+    borderStyle: "solid",
+    borderWidth: 1,
+    borderRightWidth: 0,
+    borderBottomWidth: 0
   },
   tableRow: {
-    flexDirection: "row",
+    margin: "auto",
+    flexDirection: "row"
   },
   tableColHeader: {
-    width: "25%",
+    width: "20%",
     borderStyle: "solid",
     borderWidth: 1,
-    borderColor: "#ccc",
-    backgroundColor: "#fff",
-    color: "#333",
-    fontWeight: "600",
-    padding: 5,
-    textAlign: "center"
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    backgroundColor: "#A783EE"
   },
-  InvoiceMain: {  
-    marginTop: 10,
-    marginBottom: 20
-
-  },
-
   tableCol: {
-    width: "25%",
+    width: "20%",
     borderStyle: "solid",
     borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 5,
-    textAlign: "center",
-    backgroundColor: "#fff"
+    borderLeftWidth: 0,
+    borderTopWidth: 0
+  },
+  tableCellHeader: {
+    margin: 5,
+    fontSize: 12,
+    fontWeight: 500
   },
   tableCell: {
     margin: 5,
-    fontSize: 12,
-    color: "#000"
+    fontSize: 10
   },
   total: {
     fontSize: 14,
@@ -160,7 +159,6 @@ const styles = StyleSheet.create({
     height: 2,             
     backgroundColor: "#A783EE", 
   },
-  
   thanks: {
     position: 'absolute',
     bottom: 10,            
@@ -169,7 +167,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "bold",
     color: "#000"
-  },footer: {
+  },
+  footer: {
     fontSize: 12,
     textAlign: 'center',
     position: 'absolute',
@@ -178,7 +177,8 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderColor: '#ccc',
     paddingTop: 5,
-  },totalInWords: {
+  },
+  totalInWords: {
     fontSize: 12,
     textAlign: 'center',
     marginTop: 5,
@@ -186,9 +186,7 @@ const styles = StyleSheet.create({
   },
 });
 
-
 const numberToWords = (num) => {
-  // Simplified conversion function
   const under20 = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
   const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
 
@@ -205,69 +203,67 @@ const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
   );
   const discount = total * (discountPercentage / 100);
   const finalTotal = total - discount;
-  
-
 
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         <Image style={styles.headerImage} src={headerImage} />
-        <div style={styles.InvoiceMain}>
-        <Text style={styles.headerText}>Invoice Number: {invoiceNumber}</Text>
-        <Text style={styles.headerText}>
-          Date: {new Date().toLocaleDateString()}
-        </Text>
-        </div>
+        <View style={styles.InvoiceMain}>
+          <Text style={styles.headerText}>Invoice Number: {invoiceNumber}</Text>
+          <Text style={styles.headerText}>
+            Date: {new Date().toLocaleDateString()}
+          </Text>
+        </View>
         
         <Text style={styles.sectionHeader}>Bill to:</Text>
         <View style={styles.details}>
           <Text style={styles.detailText}>
-            <strong>Name:</strong> {billTo.name}
+            <Text style={{ fontWeight: 'bold' }}>{billTo.name}</Text> ,
           </Text>
           <Text style={styles.detailText}>
-            <strong>Address:</strong> {billTo.address}
+            {billTo.address},
           </Text>
           <Text style={styles.detailText}>
-            <strong>Email:</strong> {billTo.email}
+            {billTo.email},
           </Text>
           <Text style={styles.detailText}>
-            <strong>Phone:</strong> {billTo.phone}
+            {billTo.phone}.
           </Text>
         </View>
-        <View style={styles.line} />
+
         <View style={styles.table}>
           <View style={styles.tableRow}>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCell}>S.No</Text>
+            <View style={[styles.tableColHeader, { width: "10%" }]}>
+              <Text style={styles.tableCellHeader}>S.No</Text>
             </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCell}>Item</Text>
+            <View style={[styles.tableColHeader, { width: "40%" }]}>
+              <Text style={styles.tableCellHeader}>Item</Text>
             </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCell}>Quantity</Text>
+            <View style={[styles.tableColHeader, { width: "15%" }]}>
+              <Text style={styles.tableCellHeader}>Quantity</Text>
             </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCell}>Price </Text>
+            <View style={[styles.tableColHeader, { width: "15%" }]}>
+              <Text style={styles.tableCellHeader}>Price</Text>
             </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCell}>Total </Text>
+            <View style={[styles.tableColHeader, { width: "20%" }]}>
+              <Text style={styles.tableCellHeader}>Total</Text>
             </View>
           </View>
           {items.map((item, index) => (
             <View key={index} style={styles.tableRow}>
-              <View style={styles.tableCol}>
+              <View style={[styles.tableCol, { width: "10%" }]}>
                 <Text style={styles.tableCell}>{index + 1}</Text>
               </View>
-              <View style={styles.tableCol}>
+              <View style={[styles.tableCol, { width: "40%" }]}>
                 <Text style={styles.tableCell}>{item.name}</Text>
               </View>
-              <View style={styles.tableCol}>
+              <View style={[styles.tableCol, { width: "15%" }]}>
                 <Text style={styles.tableCell}>{item.quantity}</Text>
               </View>
-              <View style={styles.tableCol}>
+              <View style={[styles.tableCol, { width: "15%" }]}>
                 <Text style={styles.tableCell}>{item.price.toFixed(2)}</Text>
               </View>
-              <View style={styles.tableCol}>
+              <View style={[styles.tableCol, { width: "20%" }]}>
                 <Text style={styles.tableCell}>
                   {(item.price * item.quantity).toFixed(2)}
                 </Text>
@@ -275,67 +271,50 @@ const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
             </View>
           ))}
           <View style={styles.tableRow}>
-            <View style={styles.tableColHeader}>
+            <View style={[styles.tableCol, { width: "65%" }]}>
               <Text style={styles.tableCell}></Text>
             </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCell}></Text>
+            <View style={[styles.tableCol, { width: "15%" }]}>
+              <Text style={styles.tableCellHeader}>Total:</Text>
             </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCell}></Text>
-            </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCell}>Total :</Text>
-            </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCell}>{total.toFixed(2)} </Text>
+            <View style={[styles.tableCol, { width: "20%" }]}>
+              <Text style={styles.tableCell}>{total.toFixed(2)}</Text>
             </View>
           </View>
-
           <View style={styles.tableRow}>
-            <View style={styles.tableColHeader}>
+            <View style={[styles.tableCol, { width: "65%" }]}>
               <Text style={styles.tableCell}></Text>
             </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCell}></Text>
+            <View style={[styles.tableCol, { width: "15%" }]}>
+              <Text style={styles.tableCellHeader}>Discount:</Text>
             </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCell}></Text>
-            </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCell}>Discount :</Text>
-            </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCell}>{discountPercentage}% ({discount.toFixed(2)}) </Text>
+            <View style={[styles.tableCol, { width: "20%" }]}>
+              <Text style={styles.tableCell}>{discountPercentage}% ({discount.toFixed(2)})</Text>
             </View>
           </View>
-
           <View style={styles.tableRow}>
-            <View style={styles.tableColHeader}>
+            <View style={[styles.tableCol, { width: "65%" }]}>
               <Text style={styles.tableCell}></Text>
             </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCell}></Text>
+            <View style={[styles.tableCol, { width: "15%" }]}>
+              <Text style={styles.tableCellHeader}>Final Total:</Text>
             </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCell}></Text>
-            </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCell}>Final Total: </Text>
-            </View>
-            <View style={styles.tableColHeader}>
+            <View style={[styles.tableCol, { width: "20%" }]}>
               <Text style={styles.tableCell}>{finalTotal.toFixed(2)}</Text>
             </View>
           </View>
-          
-        <Text style={styles.totalInWords}>Total in Words: {numberToWords(Math.floor(finalTotal))} Rupee only</Text>
         </View>
+        
+        <Text style={styles.totalInWords}>Total in Words: {numberToWords(Math.floor(finalTotal))} Rupee only</Text>
+        
         <View style={styles.line}></View>
-    <Text style={styles.thanks}>Thank You for your Business!</Text>
+        <Text style={styles.thanks}>Thank You for your Business!</Text>
       </Page>
     </Document>
   );
 };
+
+
 
 const InvoiceApp = () => {
   const [items, setItems] = useState([]);
@@ -405,6 +384,7 @@ const InvoiceApp = () => {
   const handleDeleteItem = (indexToDelete) => {
     setItems(items.filter((_, index) => index !== indexToDelete));
   };
+  
 
   const saveInvoiceToFirebase = async () => {
     const invoiceData = {
