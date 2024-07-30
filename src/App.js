@@ -52,6 +52,10 @@ import {
   doc,
   deleteDoc,
   updateDoc,
+  query,
+  where,
+  orderBy,
+  limit,
 } from "firebase/firestore";
 
 const theme = createTheme({
@@ -105,7 +109,7 @@ const styles = StyleSheet.create({
     color: "#000"
   },
   InvoiceMain: {  
-    marginTop: 8,
+    marginTop: 16,
     marginBottom: 20
   },
   table: {
@@ -180,10 +184,13 @@ const styles = StyleSheet.create({
   },
   totalInWords: {
     fontSize: 12,
-    textAlign: 'center',
     marginTop: 5,
     fontStyle: 'italic',
   },
+  bold:{
+    fontWeight: "bold"
+  },
+  
 });
 
 const numberToWords = (num) => {
@@ -201,7 +208,7 @@ const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
     (total, item) => total + item.price * item.quantity,
     0
   );
-  const discount = total * (discountPercentage / 100);
+  const discount = discountPercentage ? total * (discountPercentage / 100) : 0;
   const finalTotal = total - discount;
 
   return (
@@ -218,7 +225,7 @@ const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
         <Text style={styles.sectionHeader}>Bill to:</Text>
         <View style={styles.details}>
           <Text style={styles.detailText}>
-            <Text style={{ fontWeight: 'bold' }}>{billTo.name}</Text> ,
+            <Text style={styles.bold}>{billTo.name}</Text> ,
           </Text>
           <Text style={styles.detailText}>
             {billTo.address},
@@ -281,6 +288,7 @@ const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
               <Text style={styles.tableCell}>{total.toFixed(2)}</Text>
             </View>
           </View>
+          {discountPercentage > 0 && (
           <View style={styles.tableRow}>
             <View style={[styles.tableCol, { width: "65%" }]}>
               <Text style={styles.tableCell}></Text>
@@ -292,6 +300,7 @@ const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
               <Text style={styles.tableCell}>{discountPercentage}% ({discount.toFixed(2)})</Text>
             </View>
           </View>
+          )}
           <View style={styles.tableRow}>
             <View style={[styles.tableCol, { width: "65%" }]}>
               <Text style={styles.tableCell}></Text>
@@ -328,7 +337,7 @@ const InvoiceApp = () => {
     email: "",
     phone: "",
   });
-  const [invoiceNumber] = useState(`INV${new Date().getTime()}`);
+  const [invoiceNumber, setInvoiceNumber] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [clients, setClients] = useState([]);
   const [selectedClient, setSelectedClient] = useState("");
@@ -340,6 +349,7 @@ const InvoiceApp = () => {
   useEffect(() => {
     fetchClients();
     fetchInvoices();
+    generateInvoiceNumber();
   }, []);
 
   const fetchClients = async () => {
@@ -386,6 +396,33 @@ const InvoiceApp = () => {
   };
   
 
+  const generateInvoiceNumber = async () => {
+    const currentDate = new Date();
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const year = currentDate.getFullYear();
+    const baseInvoiceNumber = `${month}${year}`;
+
+    const invoicesCollection = collection(db, "invoices");
+    const q = query(
+      invoicesCollection,
+      where("invoiceNumber", ">=", baseInvoiceNumber),
+      where("invoiceNumber", "<", baseInvoiceNumber + "9999"),
+      orderBy("invoiceNumber", "desc"),
+      limit(1)
+    );
+
+    const querySnapshot = await getDocs(q);
+    let serialNumber = 1;
+
+    if (!querySnapshot.empty) {
+      const lastInvoice = querySnapshot.docs[0].data();
+      serialNumber = parseInt(lastInvoice.invoiceNumber.slice(-4)) + 1;
+    }
+
+    const newInvoiceNumber = `${baseInvoiceNumber}${String(serialNumber).padStart(4, '0')}`;
+    setInvoiceNumber(newInvoiceNumber);
+  };
+
   const saveInvoiceToFirebase = async () => {
     const invoiceData = {
       items,
@@ -398,6 +435,7 @@ const InvoiceApp = () => {
       await addDoc(collection(db, "invoices"), invoiceData);
       alert("Invoice saved successfully!");
       fetchInvoices();
+      generateInvoiceNumber(); // Generate new invoice number for the next invoice
     } catch (error) {
       console.error("Error saving invoice: ", error);
       alert("Failed to save invoice.");
@@ -681,7 +719,8 @@ const InvoiceApp = () => {
                         invoiceNumber={invoiceNumber}
                       />
                     }
-                    fileName="invoice.pdf"
+                    fileName={`invoiceNumber_${invoiceNumber}.pdf`}
+
                   >
                     {({ blob, url, loading, error }) =>
                       loading ? "Loading document..." : "Download now!"
