@@ -194,13 +194,38 @@ const styles = StyleSheet.create({
 });
 
 const numberToWords = (num) => {
-  const under20 = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
-  const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+  const units = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+  const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+  const scales = ['', 'Thousand', 'Lakh', 'Crore'];
 
-  if (num < 20) return under20[num];
-  if (num < 100) return tens[Math.floor(num / 10)] + (num % 10 ? '-' + under20[num % 10] : '');
-  if (num < 1000) return under20[Math.floor(num / 100)] + ' hundred' + (num % 100 ? ' ' + numberToWords(num % 100) : '');
-  return 'Number too large';
+  const convertLessThanOneThousand = (n) => {
+    if (n === 0) return '';
+    if (n < 20) return units[n];
+    const digit = n % 10;
+    if (n < 100) return tens[Math.floor(n / 10)] + (digit ? '-' + units[digit] : '');
+    return units[Math.floor(n / 100)] + ' Hundred' + (n % 100 ? ' and ' + convertLessThanOneThousand(n % 100) : '');
+  };
+
+  const convert = (n, scaleIndex) => {
+    if (n === 0) return '';
+    const lessThanOneThousand = convertLessThanOneThousand(n % 1000);
+    const rest = Math.floor(n / 1000);
+    let result = lessThanOneThousand + (lessThanOneThousand ? ' ' + scales[scaleIndex] : '');
+    if (rest > 0) {
+      if (scaleIndex === 1) { // For thousands
+        result = convert(rest, scaleIndex + 1) + (result ? ' ' + result : '');
+      } else {
+        result = convert(rest % 100, scaleIndex + 1) + (result ? ' ' + result : '');
+        if (rest >= 100) {
+          result = convert(Math.floor(rest / 100), scaleIndex + 2) + (result ? ' ' + result : '');
+        }
+      }
+    }
+    return result;
+  };
+
+  if (num === 0) return 'Zero';
+  return convert(num, 0);
 };
 
 const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
@@ -289,18 +314,23 @@ const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
             </View>
           </View>
           {discountPercentage > 0 && (
-          <View style={styles.tableRow}>
-            <View style={[styles.tableCol, { width: "65%" }]}>
-              <Text style={styles.tableCell}></Text>
+          <>
+            <View style={styles.tableRow}>
+              <View style={[styles.tableCol, { width: "65%" }]}>
+                <Text style={styles.tableCell}></Text>
+              </View>
+              <View style={[styles.tableCol, { width: "15%" }]}>
+                <Text style={styles.tableCellHeader}>Discount:</Text>
+              </View>
+              <View style={[styles.tableCol, { width: "20%" }]}>
+                <Text style={styles.tableCell}>{discountPercentage}% ({discount.toFixed(2)})</Text>
+              </View>
             </View>
-            <View style={[styles.tableCol, { width: "15%" }]}>
-              <Text style={styles.tableCellHeader}>Discount:</Text>
-            </View>
-            <View style={[styles.tableCol, { width: "20%" }]}>
-              <Text style={styles.tableCell}>{discountPercentage}% ({discount.toFixed(2)})</Text>
-            </View>
-          </View>
-          )}
+          </>
+        )}
+
+        {finalTotal !== total && (
+          <>
           <View style={styles.tableRow}>
             <View style={[styles.tableCol, { width: "65%" }]}>
               <Text style={styles.tableCell}></Text>
@@ -312,15 +342,17 @@ const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
               <Text style={styles.tableCell}>{finalTotal.toFixed(2)}</Text>
             </View>
           </View>
-        </View>
-        
-        <Text style={styles.totalInWords}>Total in Words: {numberToWords(Math.floor(finalTotal))} Rupee only</Text>
-        
-        <View style={styles.line}></View>
-        <Text style={styles.thanks}>Thank You for your Business!</Text>
-      </Page>
-    </Document>
-  );
+          </>
+        )}
+      </View>
+
+      <Text style={styles.totalInWords}>Total in Words: {numberToWords(Math.floor(finalTotal))} Rupees Only</Text>
+
+      <View style={styles.line}></View>
+      <Text style={styles.thanks}>Thank You for your Business!</Text>
+    </Page>
+  </Document>
+);
 };
 
 
