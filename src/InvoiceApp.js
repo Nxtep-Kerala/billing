@@ -8,6 +8,10 @@ import {
   Image,
   PDFDownloadLink,
 } from "@react-pdf/renderer";
+import { Box, CardHeader } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import PeopleIcon from "@mui/icons-material/People";
+import ReceiptIcon from "@mui/icons-material/Receipt";
 import {
   Container,
   Grid,
@@ -630,186 +634,271 @@ const InvoiceApp = () => {
     setBillTo({ name: "", address: "", email: "", phone: "" });
   };
 
-  return (
-    <ThemeProvider theme={theme}>
-      <Container maxWidth="sm">
-        <Card sx={{ mt: 3 }}>
-          <CardContent>
-            <Typography variant="h4" gutterBottom>
+
+    return (
+      <ThemeProvider theme={theme}>
+        <Container maxWidth="md">
+          <Box sx={{ mt: 4, mb: 4 }}>
+            <Typography variant="h3" gutterBottom align="center" color="primary">
               Invoice Generator
             </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  select
-                  fullWidth
-                  label="Select Client"
-                  value={selectedClient}
-                  onChange={handleClientSelect}
-                  variant="outlined"
-                >
-                  {clients.map((client) => (
-                    <MenuItem key={client.id} value={client.id}>
-                      {client.name}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Bill To Name"
-                  value={billTo.name}
-                  onChange={(e) =>
-                    setBillTo({ ...billTo, name: e.target.value })
-                  }
-                  variant="outlined"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Bill To Address"
-                  value={billTo.address}
-                  onChange={(e) =>
-                    setBillTo({ ...billTo, address: e.target.value })
-                  }
-                  variant="outlined"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Email"
-                  value={billTo.email}
-                  onChange={(e) =>
-                    setBillTo({ ...billTo, email: e.target.value })
-                  }
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <EmailIcon />
-                      </InputAdornment>
-                    ),
-                  }}
-                  variant="outlined"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Phone"
-                  value={billTo.phone}
-                  onChange={(e) =>
-                    setBillTo({ ...billTo, phone: e.target.value })
-                  }
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <PhoneIcon />
-                      </InputAdornment>
-                    ),
-                  }}
-                  variant="outlined"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Item Name"
-                  value={item}
-                  onChange={(e) => setItem(e.target.value)}
-                  variant="outlined"
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  label="Price "
-                  type="number"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">₹</InputAdornment>
-                    ),
-                  }}
-                  variant="outlined"
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  label="Quantity"
-                  type="number"
-                  value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
-                  variant="outlined"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Discount (%)"
-                  type="number"
-                  value={discountPercentage}
-                  onChange={(e) => setDiscountPercentage(e.target.value)}
-                  variant="outlined"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Button
-                  variant="contained"
-                  onClick={handleAddItem}
-                  color="primary"
-                  sx={{ mt: 2 }}
-                >
-                  Add Item
-                </Button>
-              </Grid>
+          </Box>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <Card elevation={3}>
+                <CardHeader title="Client Information" />
+                <CardContent>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                      <TextField
+                        select
+                        fullWidth
+                        label="Select Client"
+                        value={selectedClient}
+                        onChange={handleClientSelect}
+                        variant="outlined"
+                      >
+                        {clients.map((client) => (
+                          <MenuItem key={client.id} value={client.id}>
+                            {client.name}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        label="Bill To Name"
+                        value={billTo.name}
+                        onChange={(e) =>
+                          setBillTo({ ...billTo, name: e.target.value })
+                        }
+                        variant="outlined"
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        label="Bill To Address"
+                        value={billTo.address}
+                        onChange={(e) =>
+                          setBillTo({ ...billTo, address: e.target.value })
+                        }
+                        variant="outlined"
+                        multiline
+                        rows={2}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        label="Email"
+                        value={billTo.email}
+                        onChange={(e) =>
+                          setBillTo({ ...billTo, email: e.target.value })
+                        }
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <EmailIcon color="action" />
+                            </InputAdornment>
+                          ),
+                        }}
+                        variant="outlined"
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        label="Phone"
+                        value={billTo.phone}
+                        onChange={(e) =>
+                          setBillTo({ ...billTo, phone: e.target.value })
+                        }
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <PhoneIcon color="action" />
+                            </InputAdornment>
+                          ),
+                        }}
+                        variant="outlined"
+                      />
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
             </Grid>
-            {items.length > 0 && (
-              <TableContainer component={Paper} sx={{ mt: 2 }}>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>S.No</TableCell>
-                      <TableCell>Description</TableCell>
-                      <TableCell align="right">Quantity</TableCell>
-                      <TableCell align="right">Price </TableCell>
-                      <TableCell align="right">Total </TableCell>
-                      <TableCell align="right">Delete</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {items.map((item, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{index + 1}</TableCell>
-                        <TableCell>{item.name}</TableCell>
-                        <TableCell align="right">{item.quantity}</TableCell>
-                        <TableCell align="right">
-                          ₹{item.price.toFixed(2)}
-                        </TableCell>
-                        <TableCell align="right">
-                          ₹{(item.price * item.quantity).toFixed(2)}
-                        </TableCell>
-                        <TableCell align="right">
-                          <IconButton
-                            onClick={() => handleDeleteItem(index)}
-                            color="error"
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </TableCell>
+            <Grid item xs={12} md={6}>
+              <Card elevation={3}>
+                <CardHeader title="Item Details" />
+                <CardContent>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        label="Item Name"
+                        value={item}
+                        onChange={(e) => setItem(e.target.value)}
+                        variant="outlined"
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        fullWidth
+                        label="Price"
+                        type="number"
+                        value={price}
+                        onChange={(e) => setPrice(e.target.value)}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">₹</InputAdornment>
+                          ),
+                        }}
+                        variant="outlined"
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        fullWidth
+                        label="Quantity"
+                        type="number"
+                        value={quantity}
+                        onChange={(e) => setQuantity(e.target.value)}
+                        variant="outlined"
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        label="Discount (%)"
+                        type="number"
+                        value={discountPercentage}
+                        onChange={(e) => setDiscountPercentage(e.target.value)}
+                        variant="outlined"
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Button
+                        variant="contained"
+                        onClick={handleAddItem}
+                        color="secondary"
+                        fullWidth
+                        startIcon={<AddIcon />}
+                      >
+                        Add Item
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+    
+          {items.length > 0 && (
+            <Card sx={{ mt: 3 }} elevation={3}>
+              <CardHeader title="Invoice Items" />
+              <CardContent>
+                <TableContainer>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>S.No</TableCell>
+                        <TableCell>Description</TableCell>
+                        <TableCell align="right">Quantity</TableCell>
+                        <TableCell align="right">Price</TableCell>
+                        <TableCell align="right">Total</TableCell>
+                        <TableCell align="right">Action</TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
-            
-          </CardContent>
-        </Card>
+                    </TableHead>
+                    <TableBody>
+                      {items.map((item, index) => (
+                        <TableRow key={index}>
+                          <TableCell>{index + 1}</TableCell>
+                          <TableCell>{item.name}</TableCell>
+                          <TableCell align="right">{item.quantity}</TableCell>
+                          <TableCell align="right">₹{item.price.toFixed(2)}</TableCell>
+                          <TableCell align="right">₹{(item.price * item.quantity).toFixed(2)}</TableCell>
+                          <TableCell align="right">
+                            <IconButton
+                              onClick={() => handleDeleteItem(index)}
+                              color="error"
+                              size="small"
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </CardContent>
+            </Card>
+          )}
+    
+    <Box sx={{ mt: 2 }}>
+  <Grid container spacing={2} justifyContent="space-between">
+    <Grid item xs={12} sm={6} md={3}>
+      <Button
+        fullWidth
+        variant="contained"
+        color="primary"
+        onClick={editingInvoice ? handleUpdateInvoice : saveInvoiceToFirebase}
+        startIcon={<SaveIcon />}
+      >
+        {editingInvoice ? "Update Invoice" : "Save Invoice"}
+      </Button>
+    </Grid>
+    <Grid item xs={12} sm={6} md={3}>
+      <Button
+        fullWidth
+        variant="outlined"
+        color="primary"
+        onClick={() => setOpenClientDialog(true)}
+        startIcon={<PeopleIcon />}
+      >
+        Manage Clients
+      </Button>
+    </Grid>
+    <Grid item xs={12} sm={6} md={3}>
+      <Button
+        fullWidth
+        variant="outlined"
+        color="primary"
+        onClick={() => setOpenInvoiceDialog(true)}
+        startIcon={<ReceiptIcon />}
+      >
+        View Invoices
+      </Button>
+    </Grid>
+    <Grid item xs={12} sm={6} md={3}>
+      <PDFDownloadLink
+        document={
+          <InvoicePDF
+            items={items}
+            discountPercentage={discountPercentage}
+            billTo={billTo}
+            invoiceNumber={invoiceNumber}
+          />
+        }
+        fileName={`INV${invoiceNumber}.pdf`}
+      >
+        {({ blob, url, loading, error }) => (
+          <Button
+            fullWidth
+            variant="contained"
+            color="secondary"
+            startIcon={<GetAppIcon />}
+            disabled={loading}
+          >
+            {loading ? "Generating PDF..." : "Download PDF"}
+          </Button>
+        )}
+      </PDFDownloadLink>
+    </Grid>
+  </Grid>
+</Box>
         <Dialog open={openClientDialog} onClose={handleCloseClientDialog}>
           <DialogTitle>
             {editingClient ? "Edit Client" : "Add New Client"}
@@ -1049,16 +1138,7 @@ const InvoiceApp = () => {
           <DialogActions>
             <Button onClick={() => setSelectedInvoice(null)}>Close</Button>
           </DialogActions>
-        </Dialog><Button
-          variant="contained"
-          color="primary"
-          onClick={editingInvoice ? handleUpdateInvoice : saveInvoiceToFirebase}
-          startIcon={<SaveIcon />}
-          fullWidth
-          sx={{ mt: 2 }}
-        >
-          {editingInvoice ? "Update Invoice" : "Save Invoice"}
-        </Button>
+        </Dialog>
 
         {/* Add a cancel button when editing */}
         {editingInvoice && (
@@ -1075,64 +1155,7 @@ const InvoiceApp = () => {
             Cancel Editing
           </Button>
         )}
-        <Grid container spacing={2} sx={{ mt: 2 }}>
-              <Grid item xs={4}>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={saveInvoiceToFirebase}
-                  startIcon={<SaveIcon />}
-                  fullWidth
-                >
-                  Save Invoice
-                </Button>
-              </Grid>
-              <Grid item xs={4}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => setOpenClientDialog(true)}
-                  startIcon={<SaveIcon />}
-                  fullWidth
-                >
-                  Manage Clients
-                </Button>
-              </Grid>
-              <Grid item xs={4}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => setOpenInvoiceDialog(true)}
-                  fullWidth
-                >
-                  View Invoices
-                </Button>
-              </Grid>
-              <Grid item xs={4}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => setOpenInvoiceDialog(true)}
-                  fullWidth
-                >
-                  <PDFDownloadLink
-                    document={
-                      <InvoicePDF
-                        items={items}
-                        discountPercentage={discountPercentage}
-                        billTo={billTo}
-                        invoiceNumber={invoiceNumber}
-                      />
-                    }
-                    fileName={`INV${invoiceNumber}.pdf`}
-                  >
-                    {({ blob, url, loading, error }) =>
-                      loading ? "Loading document..." : "Download now!"
-                    }
-                  </PDFDownloadLink>{" "}
-                </Button>
-              </Grid>
-            </Grid>
+        
 
         <Snackbar
           open={openSnackbar}
