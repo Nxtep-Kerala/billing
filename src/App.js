@@ -194,16 +194,16 @@ const styles = StyleSheet.create({
 });
 
 const numberToWords = (num) => {
-  const units = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
-  const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-  const scales = ['', 'Thousand', 'Lakh', 'Crore'];
+  const units = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+  const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+  const scales = ['', 'thousand', 'lakh', 'crore'];
 
   const convertLessThanOneThousand = (n) => {
     if (n === 0) return '';
     if (n < 20) return units[n];
     const digit = n % 10;
     if (n < 100) return tens[Math.floor(n / 10)] + (digit ? '-' + units[digit] : '');
-    return units[Math.floor(n / 100)] + ' Hundred' + (n % 100 ? ' and ' + convertLessThanOneThousand(n % 100) : '');
+    return units[Math.floor(n / 100)] + ' hundred' + (n % 100 ? ' and ' + convertLessThanOneThousand(n % 100) : '');
   };
 
   const convert = (n, scaleIndex) => {
@@ -346,10 +346,10 @@ const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
         )}
       </View>
 
-      <Text style={styles.totalInWords}>Total amount to be paid {numberToWords(Math.floor(finalTotal))}Rupees Only</Text>
+      <Text style={styles.totalInWords}>Total amount to be paid is {numberToWords(Math.floor(finalTotal))}Rupees only</Text>
 
       <View style={styles.line}></View>
-      <Text style={styles.thanks}>Thank You for your Business!</Text>
+      <Text style={styles.thanks}>Thank You for Your Business!</Text>
     </Page>
   </Document>
 );
@@ -752,7 +752,7 @@ const InvoiceApp = () => {
                         invoiceNumber={invoiceNumber}
                       />
                     }
-                    fileName={`invoiceNumber_${invoiceNumber}.pdf`}
+                    fileName={`INV${invoiceNumber}.pdf`}
 
                   >
                     {({ blob, url, loading, error }) =>
