@@ -42,9 +42,12 @@ import EditIcon from "@mui/icons-material/Edit";
 import PhoneIcon from "@mui/icons-material/Phone";
 import EmailIcon from "@mui/icons-material/Email";
 import SaveIcon from "@mui/icons-material/Save";
-import headerImage from "./images/header.png";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import GetAppIcon from "@mui/icons-material/GetApp";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import db from "./firebase-config";
+import headerImage from "./images/header.png";
+
 import {
   collection,
   addDoc,
@@ -82,7 +85,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     padding: 30,
     color: "#333",
-    backgroundColor: "#fff"
+    backgroundColor: "#fff",
   },
   headerText: {
     fontSize: 14,
@@ -106,11 +109,11 @@ const styles = StyleSheet.create({
   detailText: {
     fontSize: 14,
     marginVertical: 1,
-    color: "#000"
+    color: "#000",
   },
-  InvoiceMain: {  
+  InvoiceMain: {
     marginTop: 16,
-    marginBottom: 20
+    marginBottom: 20,
   },
   table: {
     display: "table",
@@ -118,11 +121,11 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     borderWidth: 1,
     borderRightWidth: 0,
-    borderBottomWidth: 0
+    borderBottomWidth: 0,
   },
   tableRow: {
     margin: "auto",
-    flexDirection: "row"
+    flexDirection: "row",
   },
   tableColHeader: {
     width: "20%",
@@ -130,103 +133,145 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderLeftWidth: 0,
     borderTopWidth: 0,
-    backgroundColor: "#A783EE"
+    backgroundColor: "#A783EE",
   },
   tableCol: {
     width: "20%",
     borderStyle: "solid",
     borderWidth: 1,
     borderLeftWidth: 0,
-    borderTopWidth: 0
+    borderTopWidth: 0,
   },
   tableCellHeader: {
     margin: 5,
     fontSize: 14,
-    fontWeight: 500
+    fontWeight: 500,
   },
   tableCell: {
     margin: 5,
-    fontSize: 12
+    fontSize: 12,
   },
   total: {
     fontSize: 16,
     marginTop: 10,
     textAlign: "right",
     fontWeight: "bold",
-    color: "#000"
+    color: "#000",
   },
   line: {
-    position: 'absolute',   
-    bottom: 35,             
-    left: 10,               
-    right: 10,              
-    height: 2,             
-    backgroundColor: "#A783EE", 
+    position: "absolute",
+    bottom: 35,
+    left: 10,
+    right: 10,
+    height: 2,
+    backgroundColor: "#A783EE",
   },
   thanks: {
-    position: 'absolute',
-    bottom: 10,            
-    width: '100%',
+    position: "absolute",
+    bottom: 10,
+    width: "100%",
     fontSize: 14,
     textAlign: "center",
     fontWeight: "bold",
-    color: "#000"
+    color: "#000",
   },
   footer: {
     fontSize: 14,
-    position: 'absolute',
-    display: 'flex',
-    justifycontent: 'center',
-    alignitems: 'center',
+    position: "absolute",
+    display: "flex",
+    justifycontent: "center",
+    alignitems: "center",
     bottom: 20,
-    width: '100%',
+    width: "100%",
     borderTopWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     paddingTop: 5,
   },
   totalInWords: {
     fontSize: 14,
     marginTop: 15,
-    fontStyle: 'italic',
+    fontStyle: "italic",
   },
-  bold:{
-    fontWeight: "bold"
+  bold: {
+    fontWeight: "bold",
   },
-  
 });
 
 const numberToWords = (num) => {
-  const units = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
-  const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
-  const scales = ['', 'thousand', 'lakh', 'crore'];
+  const units = [
+    "",
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "ten",
+    "eleven",
+    "twelve",
+    "thirteen",
+    "fourteen",
+    "fifteen",
+    "sixteen",
+    "seventeen",
+    "eighteen",
+    "nineteen",
+  ];
+  const tens = [
+    "",
+    "",
+    "twenty",
+    "thirty",
+    "forty",
+    "fifty",
+    "sixty",
+    "seventy",
+    "eighty",
+    "ninety",
+  ];
+  const scales = ["", "thousand", "lakh", "crore"];
 
   const convertLessThanOneThousand = (n) => {
-    if (n === 0) return '';
+    if (n === 0) return "";
     if (n < 20) return units[n];
     const digit = n % 10;
-    if (n < 100) return tens[Math.floor(n / 10)] + (digit ? '-' + units[digit] : '');
-    return units[Math.floor(n / 100)] + ' hundred' + (n % 100 ? ' and ' + convertLessThanOneThousand(n % 100) : '');
+    if (n < 100)
+      return tens[Math.floor(n / 10)] + (digit ? "-" + units[digit] : "");
+    return (
+      units[Math.floor(n / 100)] +
+      " hundred" +
+      (n % 100 ? " and " + convertLessThanOneThousand(n % 100) : "")
+    );
   };
 
   const convert = (n, scaleIndex) => {
-    if (n === 0) return '';
+    if (n === 0) return "";
     const lessThanOneThousand = convertLessThanOneThousand(n % 1000);
     const rest = Math.floor(n / 1000);
-    let result = lessThanOneThousand + (lessThanOneThousand ? ' ' + scales[scaleIndex] : '');
+    let result =
+      lessThanOneThousand +
+      (lessThanOneThousand ? " " + scales[scaleIndex] : "");
     if (rest > 0) {
-      if (scaleIndex === 1) { // For thousands
-        result = convert(rest, scaleIndex + 1) + (result ? ' ' + result : '');
+      if (scaleIndex === 1) {
+        // For thousands
+        result = convert(rest, scaleIndex + 1) + (result ? " " + result : "");
       } else {
-        result = convert(rest % 100, scaleIndex + 1) + (result ? ' ' + result : '');
+        result =
+          convert(rest % 100, scaleIndex + 1) + (result ? " " + result : "");
         if (rest >= 100) {
-          result = convert(Math.floor(rest / 100), scaleIndex + 2) + (result ? ' ' + result : '');
+          result =
+            convert(Math.floor(rest / 100), scaleIndex + 2) +
+            (result ? " " + result : "");
         }
       }
     }
     return result;
   };
 
-  if (num === 0) return 'Zero';
+  if (num === 0) return "Zero";
   return convert(num, 0);
 };
 
@@ -238,6 +283,7 @@ const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
   const discount = discountPercentage ? total * (discountPercentage / 100) : 0;
   const finalTotal = total - discount;
 
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -248,21 +294,15 @@ const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
             Date: {new Date().toLocaleDateString()}
           </Text>
         </View>
-        
+
         <Text style={styles.sectionHeader}>Bill to:</Text>
         <View style={styles.details}>
           <Text style={styles.detailText}>
             <Text style={styles.bold}>{billTo.name}</Text> ,
           </Text>
-          <Text style={styles.detailText}>
-            {billTo.address},
-          </Text>
-          <Text style={styles.detailText}>
-            {billTo.email},
-          </Text>
-          <Text style={styles.detailText}>
-            {billTo.phone}.
-          </Text>
+          <Text style={styles.detailText}>{billTo.address},</Text>
+          <Text style={styles.detailText}>{billTo.email},</Text>
+          <Text style={styles.detailText}>{billTo.phone}.</Text>
         </View>
 
         <View style={styles.table}>
@@ -316,48 +356,51 @@ const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
             </View>
           </View>
           {discountPercentage > 0 && (
-          <>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCol, { width: "65%" }]}>
-                <Text style={styles.tableCell}></Text>
+            <>
+              <View style={styles.tableRow}>
+                <View style={[styles.tableCol, { width: "65%" }]}>
+                  <Text style={styles.tableCell}></Text>
+                </View>
+                <View style={[styles.tableCol, { width: "15%" }]}>
+                  <Text style={styles.tableCellHeader}>Discount:</Text>
+                </View>
+                <View style={[styles.tableCol, { width: "20%" }]}>
+                  <Text style={styles.tableCell}>
+                    {discountPercentage}% ({discount.toFixed(2)})
+                  </Text>
+                </View>
               </View>
-              <View style={[styles.tableCol, { width: "15%" }]}>
-                <Text style={styles.tableCellHeader}>Discount:</Text>
+            </>
+          )}
+
+          {finalTotal !== total && (
+            <>
+              <View style={styles.tableRow}>
+                <View style={[styles.tableCol, { width: "65%" }]}>
+                  <Text style={styles.tableCell}></Text>
+                </View>
+                <View style={[styles.tableCol, { width: "15%" }]}>
+                  <Text style={styles.tableCellHeader}>Final Total:</Text>
+                </View>
+                <View style={[styles.tableCol, { width: "20%" }]}>
+                  <Text style={styles.tableCell}>{finalTotal.toFixed(2)}</Text>
+                </View>
               </View>
-              <View style={[styles.tableCol, { width: "20%" }]}>
-                <Text style={styles.tableCell}>{discountPercentage}% ({discount.toFixed(2)})</Text>
-              </View>
-            </View>
-          </>
-        )}
+            </>
+          )}
+        </View>
 
-        {finalTotal !== total && (
-          <>
-          <View style={styles.tableRow}>
-            <View style={[styles.tableCol, { width: "65%" }]}>
-              <Text style={styles.tableCell}></Text>
-            </View>
-            <View style={[styles.tableCol, { width: "15%" }]}>
-              <Text style={styles.tableCellHeader}>Final Total:</Text>
-            </View>
-            <View style={[styles.tableCol, { width: "20%" }]}>
-              <Text style={styles.tableCell}>{finalTotal.toFixed(2)}</Text>
-            </View>
-          </View>
-          </>
-        )}
-      </View>
+        <Text style={styles.totalInWords}>
+          Total amount to be paid is {numberToWords(Math.floor(finalTotal))}
+          Rupees only
+        </Text>
 
-      <Text style={styles.totalInWords}>Total amount to be paid is {numberToWords(Math.floor(finalTotal))}Rupees only</Text>
-
-      <View style={styles.line}></View>
-      <Text style={styles.thanks}>Thank you for choosing us!</Text>
-    </Page>
-  </Document>
-);
+        <View style={styles.line}></View>
+        <Text style={styles.thanks}>Thank you for choosing us!</Text>
+      </Page>
+    </Document>
+  );
 };
-
-
 
 const InvoiceApp = () => {
   const [items, setItems] = useState([]);
@@ -379,6 +422,65 @@ const InvoiceApp = () => {
   const [openInvoiceDialog, setOpenInvoiceDialog] = useState(false);
   const [editingClient, setEditingClient] = useState(null);
   const [invoices, setInvoices] = useState([]);
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [editingInvoice, setEditingInvoice] = useState(null);
+
+  const handleViewInvoice = (invoice) => {
+    setSelectedInvoice(invoice);
+    setOpenInvoiceDialog(true);
+  };
+
+  const handleEditInvoice = (invoice) => {
+    setEditingInvoice(invoice);
+    setItems(invoice.items);
+    setBillTo(invoice.billTo);
+    setDiscountPercentage(invoice.discountPercentage);
+    setInvoiceNumber(invoice.invoiceNumber);
+    setOpenInvoiceDialog(false);
+  };
+
+  const handleDeleteInvoice = async (invoiceId) => {
+    try {
+      await deleteDoc(doc(db, "invoices", invoiceId));
+      alert("Invoice deleted successfully!");
+      fetchInvoices();
+    } catch (error) {
+      console.error("Error deleting invoice: ", error);
+      alert("Failed to delete invoice.");
+    }
+  };
+
+  const handleUpdateInvoice = async () => {
+    if (!editingInvoice) return;
+
+    const updatedInvoiceData = {
+      items,
+      discountPercentage,
+      billTo,
+      invoiceNumber: editingInvoice.invoiceNumber,
+      createdAt: editingInvoice.createdAt,
+      updatedAt: new Date(),
+    };
+
+    try {
+      await updateDoc(doc(db, "invoices", editingInvoice.id), updatedInvoiceData);
+      alert("Invoice updated successfully!");
+      fetchInvoices();
+      setEditingInvoice(null);
+      resetForm();
+    } catch (error) {
+      console.error("Error updating invoice: ", error);
+      alert("Failed to update invoice.");
+    }
+  };
+
+  const resetForm = () => {
+    setItems([]);
+    setBillTo({ name: "", address: "", email: "", phone: "" });
+    setDiscountPercentage(0);
+    setInvoiceNumber("");
+    setSelectedClient("");
+  };
 
   useEffect(() => {
     fetchClients();
@@ -428,14 +530,13 @@ const InvoiceApp = () => {
   const handleDeleteItem = (indexToDelete) => {
     setItems(items.filter((_, index) => index !== indexToDelete));
   };
-  
 
   const generateInvoiceNumber = async () => {
     const currentDate = new Date();
-    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const month = String(currentDate.getMonth() + 1).padStart(2, "0");
     const year = String(currentDate.getFullYear()).slice(-2); // Get last 2 digits of the year
     const baseInvoiceNumber = `${month}${year}`;
-  
+
     const invoicesCollection = collection(db, "invoices");
     const q = query(
       invoicesCollection,
@@ -444,19 +545,20 @@ const InvoiceApp = () => {
       orderBy("invoiceNumber", "desc"),
       limit(1)
     );
-  
+
     const querySnapshot = await getDocs(q);
     let serialNumber = 1;
-  
+
     if (!querySnapshot.empty) {
       const lastInvoice = querySnapshot.docs[0].data();
       serialNumber = parseInt(lastInvoice.invoiceNumber.slice(4)) + 1;
     }
-  
-    const newInvoiceNumber = `${baseInvoiceNumber}${String(serialNumber).padStart(3, '0')}`;
+
+    const newInvoiceNumber = `${baseInvoiceNumber}${String(
+      serialNumber
+    ).padStart(3, "0")}`;
     setInvoiceNumber(newInvoiceNumber);
   };
-  
 
   const saveInvoiceToFirebase = async () => {
     const invoiceData = {
@@ -705,65 +807,7 @@ const InvoiceApp = () => {
                 </Table>
               </TableContainer>
             )}
-            <Grid container spacing={2} sx={{ mt: 2 }}>
-              <Grid item xs={4}>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={saveInvoiceToFirebase}
-                  startIcon={<SaveIcon />}
-                  fullWidth
-                >
-                  Save Invoice
-                </Button>
-              </Grid>
-              <Grid item xs={4}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => setOpenClientDialog(true)}
-                  startIcon={<SaveIcon />}
-                  fullWidth
-                >
-                  Manage Clients
-                </Button>
-              </Grid>
-              <Grid item xs={4}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => setOpenInvoiceDialog(true)}
-                  fullWidth
-                >
-                  View Invoices
-                </Button>
-              </Grid>
-              <Grid item xs={4}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => setOpenInvoiceDialog(true)}
-                  fullWidth
-                >
-                  <PDFDownloadLink
-                    document={
-                      <InvoicePDF
-                        items={items}
-                        discountPercentage={discountPercentage}
-                        billTo={billTo}
-                        invoiceNumber={invoiceNumber}
-                      />
-                    }
-                    fileName={`INV${invoiceNumber}.pdf`}
-
-                  >
-                    {({ blob, url, loading, error }) =>
-                      loading ? "Loading document..." : "Download now!"
-                    }
-                  </PDFDownloadLink>{" "}
-                </Button>
-              </Grid>
-            </Grid>
+            
           </CardContent>
         </Card>
         <Dialog open={openClientDialog} onClose={handleCloseClientDialog}>
@@ -885,6 +929,210 @@ const InvoiceApp = () => {
             <Button onClick={() => setOpenInvoiceDialog(false)}>Close</Button>
           </DialogActions>
         </Dialog>
+        <Dialog
+          open={openInvoiceDialog}
+          onClose={() => setOpenInvoiceDialog(false)}
+          maxWidth="md"
+          fullWidth
+        >
+          <DialogTitle>Previous Invoices</DialogTitle>
+          <DialogContent>
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Invoice Number</TableCell>
+                    <TableCell>Client Name</TableCell>
+                    <TableCell>Date</TableCell>
+                    <TableCell>Total Amount</TableCell>
+                    <TableCell>Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {invoices.map((invoice) => (
+                    <TableRow key={invoice.id}>
+                      <TableCell>{invoice.invoiceNumber}</TableCell>
+                      <TableCell>{invoice.billTo.name}</TableCell>
+                      <TableCell>
+                        {new Date(invoice.createdAt.seconds * 1000).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        ₹
+                        {invoice.items
+                          .reduce((total, item) => total + item.price * item.quantity, 0)
+                          .toFixed(2)}
+                      </TableCell>
+                      <TableCell>
+                        <IconButton onClick={() => handleViewInvoice(invoice)}>
+                          <VisibilityIcon />
+                        </IconButton>
+                        <IconButton onClick={() => handleEditInvoice(invoice)}>
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton onClick={() => handleDeleteInvoice(invoice.id)}>
+                          <DeleteIcon />
+                        </IconButton>
+                        <PDFDownloadLink
+                          document={
+                            <InvoicePDF
+                              items={invoice.items}
+                              discountPercentage={invoice.discountPercentage}
+                              billTo={invoice.billTo}
+                              invoiceNumber={invoice.invoiceNumber}
+                            />
+                          }
+                          fileName={`INV${invoice.invoiceNumber}.pdf`}
+                        >
+                          {({ blob, url, loading, error }) => (
+                            <IconButton disabled={loading}>
+                              <GetAppIcon />
+                            </IconButton>
+                          )}
+                        </PDFDownloadLink>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenInvoiceDialog(false)}>Close</Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Add a new Dialog for viewing a single invoice */}
+        <Dialog
+          open={Boolean(selectedInvoice)}
+          onClose={() => setSelectedInvoice(null)}
+          maxWidth="md"
+          fullWidth
+        >
+          <DialogTitle>Invoice Details</DialogTitle>
+          <DialogContent>
+            {selectedInvoice && (
+              <>
+                <Typography variant="h6">Invoice Number: {selectedInvoice.invoiceNumber}</Typography>
+                <Typography>Client: {selectedInvoice.billTo.name}</Typography>
+                <Typography>Date: {new Date(selectedInvoice.createdAt.seconds * 1000).toLocaleDateString()}</Typography>
+                <TableContainer component={Paper} sx={{ mt: 2 }}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Item</TableCell>
+                        <TableCell align="right">Quantity</TableCell>
+                        <TableCell align="right">Price</TableCell>
+                        <TableCell align="right">Total</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {selectedInvoice.items.map((item, index) => (
+                        <TableRow key={index}>
+                          <TableCell>{item.name}</TableCell>
+                          <TableCell align="right">{item.quantity}</TableCell>
+                          <TableCell align="right">₹{item.price.toFixed(2)}</TableCell>
+                          <TableCell align="right">₹{(item.price * item.quantity).toFixed(2)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+                <Typography variant="h6" align="right" sx={{ mt: 2 }}>
+                  Total: ₹
+                  {selectedInvoice.items
+                    .reduce((total, item) => total + item.price * item.quantity, 0)
+                    .toFixed(2)}
+                </Typography>
+              </>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setSelectedInvoice(null)}>Close</Button>
+          </DialogActions>
+        </Dialog><Button
+          variant="contained"
+          color="primary"
+          onClick={editingInvoice ? handleUpdateInvoice : saveInvoiceToFirebase}
+          startIcon={<SaveIcon />}
+          fullWidth
+          sx={{ mt: 2 }}
+        >
+          {editingInvoice ? "Update Invoice" : "Save Invoice"}
+        </Button>
+
+        {/* Add a cancel button when editing */}
+        {editingInvoice && (
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => {
+              setEditingInvoice(null);
+              resetForm();
+            }}
+            fullWidth
+            sx={{ mt: 2 }}
+          >
+            Cancel Editing
+          </Button>
+        )}
+        <Grid container spacing={2} sx={{ mt: 2 }}>
+              <Grid item xs={4}>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={saveInvoiceToFirebase}
+                  startIcon={<SaveIcon />}
+                  fullWidth
+                >
+                  Save Invoice
+                </Button>
+              </Grid>
+              <Grid item xs={4}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => setOpenClientDialog(true)}
+                  startIcon={<SaveIcon />}
+                  fullWidth
+                >
+                  Manage Clients
+                </Button>
+              </Grid>
+              <Grid item xs={4}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => setOpenInvoiceDialog(true)}
+                  fullWidth
+                >
+                  View Invoices
+                </Button>
+              </Grid>
+              <Grid item xs={4}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => setOpenInvoiceDialog(true)}
+                  fullWidth
+                >
+                  <PDFDownloadLink
+                    document={
+                      <InvoicePDF
+                        items={items}
+                        discountPercentage={discountPercentage}
+                        billTo={billTo}
+                        invoiceNumber={invoiceNumber}
+                      />
+                    }
+                    fileName={`INV${invoiceNumber}.pdf`}
+                  >
+                    {({ blob, url, loading, error }) =>
+                      loading ? "Loading document..." : "Download now!"
+                    }
+                  </PDFDownloadLink>{" "}
+                </Button>
+              </Grid>
+            </Grid>
 
         <Snackbar
           open={openSnackbar}
