@@ -79,32 +79,32 @@ const theme = createTheme({
 const styles = StyleSheet.create({
   page: {
     fontFamily: "Helvetica",
-    fontSize: 12,
+    fontSize: 14,
     padding: 30,
     color: "#333",
     backgroundColor: "#fff"
   },
   headerText: {
-    fontSize: 12,
+    fontSize: 14,
     marginBottom: 5,
     textAlign: "left",
     fontWeight: "bold",
     color: "#000",
   },
   sectionHeader: {
-    fontSize: 12,
+    fontSize: 14,
     marginVertical: 5,
     textAlign: "left",
     fontWeight: "bold",
     color: "#000",
   },
   details: {
-    marginBottom: 10,
+    marginBottom: 15,
     padding: 5,
     borderRadius: 5,
   },
   detailText: {
-    fontSize: 12,
+    fontSize: 14,
     marginVertical: 1,
     color: "#000"
   },
@@ -141,15 +141,15 @@ const styles = StyleSheet.create({
   },
   tableCellHeader: {
     margin: 5,
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: 500
   },
   tableCell: {
     margin: 5,
-    fontSize: 10
+    fontSize: 12
   },
   total: {
-    fontSize: 14,
+    fontSize: 16,
     marginTop: 10,
     textAlign: "right",
     fontWeight: "bold",
@@ -167,13 +167,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 10,            
     width: '100%',
-    fontSize: 12,
+    fontSize: 14,
     textAlign: "center",
     fontWeight: "bold",
     color: "#000"
   },
   footer: {
-    fontSize: 12,
+    fontSize: 14,
     textAlign: 'center',
     position: 'absolute',
     bottom: 20,
@@ -183,8 +183,8 @@ const styles = StyleSheet.create({
     paddingTop: 5,
   },
   totalInWords: {
-    fontSize: 12,
-    marginTop: 5,
+    fontSize: 14,
+    marginTop: 15,
     fontStyle: 'italic',
   },
   bold:{
@@ -266,7 +266,7 @@ const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
         <View style={styles.table}>
           <View style={styles.tableRow}>
             <View style={[styles.tableColHeader, { width: "10%" }]}>
-              <Text style={styles.tableCellHeader}>S.No</Text>
+              <Text style={styles.tableCellHeader}>Sl no.</Text>
             </View>
             <View style={[styles.tableColHeader, { width: "40%" }]}>
               <Text style={styles.tableCellHeader}>Item</Text>
@@ -346,7 +346,7 @@ const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
         )}
       </View>
 
-      <Text style={styles.totalInWords}>Total in Words: {numberToWords(Math.floor(finalTotal))} Rupees Only</Text>
+      <Text style={styles.totalInWords}>Total amount to be paid {numberToWords(Math.floor(finalTotal))}Rupees Only</Text>
 
       <View style={styles.line}></View>
       <Text style={styles.thanks}>Thank You for your Business!</Text>
@@ -431,29 +431,30 @@ const InvoiceApp = () => {
   const generateInvoiceNumber = async () => {
     const currentDate = new Date();
     const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-    const year = currentDate.getFullYear();
+    const year = String(currentDate.getFullYear()).slice(-2); // Get last 2 digits of the year
     const baseInvoiceNumber = `${month}${year}`;
-
+  
     const invoicesCollection = collection(db, "invoices");
     const q = query(
       invoicesCollection,
-      where("invoiceNumber", ">=", baseInvoiceNumber),
-      where("invoiceNumber", "<", baseInvoiceNumber + "9999"),
+      where("invoiceNumber", ">=", baseInvoiceNumber + "001"),
+      where("invoiceNumber", "<", baseInvoiceNumber + "999"),
       orderBy("invoiceNumber", "desc"),
       limit(1)
     );
-
+  
     const querySnapshot = await getDocs(q);
     let serialNumber = 1;
-
+  
     if (!querySnapshot.empty) {
       const lastInvoice = querySnapshot.docs[0].data();
-      serialNumber = parseInt(lastInvoice.invoiceNumber.slice(-4)) + 1;
+      serialNumber = parseInt(lastInvoice.invoiceNumber.slice(4)) + 1;
     }
-
-    const newInvoiceNumber = `${baseInvoiceNumber}${String(serialNumber).padStart(4, '0')}`;
+  
+    const newInvoiceNumber = `${baseInvoiceNumber}${String(serialNumber).padStart(3, '0')}`;
     setInvoiceNumber(newInvoiceNumber);
   };
+  
 
   const saveInvoiceToFirebase = async () => {
     const invoiceData = {
