@@ -395,8 +395,7 @@ const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
         </View>
 
         <Text style={styles.totalInWords}>
-          Total amount to be paid is {numberToWords(Math.floor(finalTotal))}
-          Rupees only
+          Total amount to be paid is {numberToWords(Math.floor(finalTotal))} Rupees only
         </Text>
 
         <View style={styles.line}></View>
