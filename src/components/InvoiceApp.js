@@ -324,7 +324,7 @@ const InvoicePDF = ({ items, discountPercentage, billTo, invoiceNumber }) => {
               <Text style={styles.tableCellHeader}>Price</Text>
             </View>
             <View style={[styles.tableColHeader, { width: "20%" }]}>
-              <Text style={styles.tableCellHeader}>Total</Text>
+              <Text style={styles.tableCellHeader}>Amount</Text>
             </View>
           </View>
           {items.map((item, index) => (
