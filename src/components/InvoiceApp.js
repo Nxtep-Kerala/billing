@@ -49,8 +49,8 @@ import SaveIcon from "@mui/icons-material/Save";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import GetAppIcon from "@mui/icons-material/GetApp";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import db from "./firebase-config";
-import headerImage from "./images/header.png";
+import db from "../firebase-config";
+import headerImage from "../images/header.png";
 
 import {
   collection,

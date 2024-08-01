@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Auth from './Auth';
-import InvoiceApp from './InvoiceApp';
+import Auth from './components/Auth';
+import InvoiceApp from './components/InvoiceApp';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
