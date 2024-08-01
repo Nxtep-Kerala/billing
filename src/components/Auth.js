@@ -13,7 +13,7 @@ const Auth = ({ onLogin }) => {
       { username: process.env.REACT_APP_USERNAME1, password: process.env.REACT_APP_PASSWORD1 },
       { username: process.env.REACT_APP_USERNAME2, password: process.env.REACT_APP_PASSWORD2 },
       { username: process.env.REACT_APP_USERNAME3, password: process.env.REACT_APP_PASSWORD3 },
-      // Add more as needed
+      { username: process.env.REACT_APP_USERNAME4, password: process.env.REACT_APP_PASSWORD4 }
     ];
     const isValid = credentials.some(cred => cred.username === username && cred.password === password);
 
